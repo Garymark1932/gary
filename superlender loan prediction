@@ -131,3 +131,18 @@ df1= df.drop(['good_bad_flag','birthdate','bank_account_type','Contract',
 cols = [ 'loanamount', 'Current', 'Other', 'Savings', 'Permanent', 'Retired',
          'Self-Employed', 'Student', 'Unemployed', 'Graduate','Primary', 'Secondary', 'age', 'period_payment', 'overdue_dummy',
          'termdays_30', 'termdays_60', 'termdays_15']
+ X_train = df1[cols]
+X_test = df1_test[cols_test]
+y = df1.Good
+# import the class
+from sklearn.linear_model import LogisticRegression
+
+# instantiate the model (using the default parameters)
+logreg = LogisticRegression()
+
+# fit the model with data
+logreg.fit(X_train,y)
+
+y_pred=logreg.predict(X_test)
+import numpy as np
+df1_test['b'] = np.array(y_pred)
