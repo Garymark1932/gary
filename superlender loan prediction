@@ -1,0 +1,133 @@
+###import modules 
+import pandas as pd
+from datetime import date
+from datetime import datetime
+from dateutil.parser import parse
+
+####import data
+data_test=pd.read_csv('C:/Users/user/Desktop/superlender/data_test.csv')
+
+#### coverting date columns into datetime
+data_test["birthdate"] = pd.to_datetime(data_test["birthdate"])
+data_test["closeddate"] = pd.to_datetime(data_test["closeddate_test"])
+data_test["approveddate"] = pd.to_datetime(data_test["approveddate_test"])
+data_test["firstduedate"] = pd.to_datetime(data_test["firstduedate_test"])
+data_test["firstrepaiddate"] = pd.to_datetime(data_test["firstrepaiddate_test"])
+# Create a set of dummy variables from the good_bad_flag variable
+data_account_test= pd.get_dummies(data_test['bank_account_type_test'])
+data_employment_test= pd.get_dummies(data_test['employment_status_clients_test'])
+data_education_test= pd.get_dummies(data_test['level_of_education_clients_test'])
+# joining the new columns
+df_test= data_test.join([data_account_test,data_employment_test,data_education_test])
+#defining new columns 
+df_test['age'] = datetime.now().year -df_test['birthdate'].dt.year
+df_test['period_payment'] = (df_test['closeddate'] - df_test['approveddate']).dt.days
+df_test['overdue'] = (df_test['firstduedate'] - df_test['firstrepaiddate']).dt.days
+
+##creatig overdue and termdays dummies
+a = []
+for row in df_test['overdue']:
+    if row > 0:
+        a.append(1)
+    else:
+        a.append(0)
+df_test['overdue_dummy'] = a
+b = []
+for row in df_test['termdays_test']:
+    if row == 30:
+        b.append(1)
+    else:
+        b.append(0)
+df_test['termdays_30'] = b
+c = []
+for row in df_test['termdays_test']:
+    if row == 60:
+        c.append(1)
+    else:
+        c.append(0)
+df_test['termdays_60'] = b
+d = []
+for row in df_test['termdays_test']:
+    if row == 15:
+        d.append(1)
+    else:
+        d.append(0)
+df_test['termdays_15'] = d
+# dropping some columns
+df1_test= df_test.drop(['birthdate','bank_account_type_test', 'employment_status_clients_test', 'level_of_education_clients_test',
+                        'termdays_test','closeddate','approveddate','firstduedate','firstrepaiddate','overdue'], axis=1)
+df1_test.rename(columns={'systemloanid':'systemloanid_test', 'Current':'Current_test','Other':'Other_test',
+                         'Savings':'Savings_test',  'Permanent': 'Permanent_test','Retired': 'Retired_test',
+                         'Student':'Student_test','Self-Employed':'Self-Employed_test','Unemployed': 'Unemployed_test',
+                         'Graduate': 'Graduate_test','Post-graduate':'Post_Graduate_test','Primary':'Primary_test',
+                         'Secondary':'Secondary_test','age':'age_test','period_payment':'period_payment_test',
+                         'overdue_dummy': 'overdue_dummy_test','termdays_30': 'termdays30_test', 'termdays_60':'termdays60_test',
+                         'termdays_15':'termdays15_test'}, 
+                 inplace=True)
+cols_test = [ 'loanamount_test', 'Current_test', 'Other_test', 'Savings_test', 'Permanent_test', 'Retired_test',
+         'Self-Employed_test', 'Student_test', 'Unemployed_test', 'Graduate_test', 'Primary_test', 'Secondary_test',
+        'age_test', 'period_payment_test', 'overdue_dummy_test','termdays30_test', 'termdays60_test', 'termdays15_test']
+###import modules 
+import pandas as pd
+from datetime import date
+from datetime import datetime
+from dateutil.parser import parse
+
+####import data
+data=pd.read_csv('C:/Users/user/Desktop/superlender/data-train.csv')
+
+#### coverting date columns into datetime
+data["birthdate"] = pd.to_datetime(data["birthdate"])
+data["closeddate"] = pd.to_datetime(data["closeddate"])
+data["approveddate"] = pd.to_datetime(data["approveddate"])
+data["firstduedate"] = pd.to_datetime(data["firstduedate"])
+data["firstrepaiddate"] = pd.to_datetime(data["firstrepaiddate"])
+# Create a set of dummy variables from the good_bad_flag variable
+data_good= pd.get_dummies(data['good_bad_flag'])
+data_account= pd.get_dummies(data['bank_account_type'])
+data_employment= pd.get_dummies(data['employment_status_clients'])
+data_education= pd.get_dummies(data['level_of_education_clients'])
+# joining the new columns
+df= data.join([data_good, data_account,data_employment,data_education])
+#defining new columns 
+df['age'] = datetime.now().year -df['birthdate'].dt.year
+df['period_payment'] = (df['closeddate'] - df['approveddate']).dt.days
+df['overdue'] = (df['firstduedate'] - df['firstrepaiddate']).dt.days
+
+##creatig overdue and termdays dummies
+a = []
+for row in df['overdue']:
+    if row > 0:
+        a.append(1)
+    else:
+        a.append(0)
+df['overdue_dummy'] = a
+b = []
+for row in df['termdays']:
+    if row == 30:
+        b.append(1)
+    else:
+        b.append(0)
+df['termdays_30'] = b
+c = []
+for row in df['termdays']:
+    if row == 60:
+        c.append(1)
+    else:
+        c.append(0)
+df['termdays_60'] = b
+d = []
+for row in df['termdays']:
+    if row == 15:
+        d.append(1)
+    else:
+        d.append(0)
+df['termdays_15'] = d
+# dropping some columns
+df1= df.drop(['good_bad_flag','birthdate','bank_account_type','Contract',
+              'employment_status_clients', 'level_of_education_clients','termdays',
+              'closeddate','approveddate','firstduedate','firstrepaiddate', 'Bad','overdue'], axis=1)
+#split dataset in features and target variable
+cols = [ 'loanamount', 'Current', 'Other', 'Savings', 'Permanent', 'Retired',
+         'Self-Employed', 'Student', 'Unemployed', 'Graduate','Primary', 'Secondary', 'age', 'period_payment', 'overdue_dummy',
+         'termdays_30', 'termdays_60', 'termdays_15']
